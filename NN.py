@@ -32,8 +32,9 @@ def cost(reg_lambda, num_layers, thetas, trainings):
         assert(y.ndim == 1)  # ensure training instance is just vector, since it's the last layer
         j = (-1 * y) * np.log(output) - ((np.ones(y.size)-y) * np.log(np.ones(y.size)-output))
         assert(j.ndim == 1)  # j should also be just a vector since y and output are vecs
+        j = np.sum(j)
         print(f"Cost J: {j}")
-        j_sum += np.sum(j)
+        j_sum += j
     n = len(trainings)
     j_sum /= n
     S = 0  # sum of squares of all weights of the network besides bias weights
@@ -42,3 +43,4 @@ def cost(reg_lambda, num_layers, thetas, trainings):
     S *= reg_lambda/(2 * n)
     print(f"Final (regularized) cost, J, based on the complete training set: {j_sum + S}")
     return j_sum + S
+
