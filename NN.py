@@ -78,7 +78,7 @@ def back_propagation(alpha, epsilon, max_iterations, reg_lambda, num_layers, the
             if do_print: print("----------------Calculating Deltas----------------")
             delta = output - y
             if do_print: print(f"delta{len(thetas) + 1}: {delta}")
-            all_deltas = [np.array([delta.copy()]).T]
+            all_deltas = [np.array([delta.copy()]).T] # ensure column vector!!
             # since len thetas is 1 less than num layers, guaranteed to be for all layers L-1...2 (if start from 1)
             for k in range(len(thetas) - 1, 0, -1):
                 # remove first column of thetas, being the bias deltas.
@@ -106,10 +106,14 @@ def back_propagation(alpha, epsilon, max_iterations, reg_lambda, num_layers, the
             regularizer = reg_lambda * thetas[k]  # regularizer is P in pseudocode
             regularizer[:, 0] = 0
             accumulated_gradients[k] = (1 / n) * (accumulated_gradients[k] + regularizer)
-            if do_print: print(f"theta{k + 1}:\n {accumulated_gradients[k]}")
+
+        if do_print:
+            for i in range(len(thetas)):
+                print(f"theta{i + 1}:\n {accumulated_gradients[i]}")
+
+        # updating weights
         for k in range(num_layers - 2, -1, -1):
             thetas[k] -= alpha * accumulated_gradients[k]
-
         diff = J - cost(reg_lambda, num_layers, thetas, trainings, False)
         J = cost(reg_lambda, num_layers, thetas, trainings, False)
         iterations += 1
