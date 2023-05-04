@@ -65,7 +65,7 @@ def back_propagation(alpha, epsilon, max_iterations, reg_lambda, num_layers, the
     diff = float('inf')
     iterations = 0
     while diff > epsilon and iterations < max_iterations:
-        if do_print: print(f"Cost: {J}")
+        print(f"Cost: {J}")
         # print(f"Diff: {diff}")
         accumulated_gradients = {}
         for i in range(len(thetas)):
@@ -111,7 +111,7 @@ def back_propagation(alpha, epsilon, max_iterations, reg_lambda, num_layers, the
             for i in range(len(thetas)):
                 print(f"theta{i + 1}:\n {accumulated_gradients[i]}")
 
-        # updating weights
+        # -----updating weights------
         for k in range(num_layers - 2, -1, -1):
             thetas[k] -= alpha * accumulated_gradients[k]
         diff = J - cost(reg_lambda, num_layers, thetas, trainings, False)
