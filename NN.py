@@ -53,6 +53,10 @@ def cost(reg_lambda, num_layers, thetas, trainings):
 # thetas: python list of numpy arrays,corresponding to each theta array
 def back_propagation(reg_lambda, num_layers, thetas, trainings):
     assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
+    # TODO: add stopping criteria
+    accumulated_gradients = {}
+    for i in range(len(thetas)):
+        accumulated_gradients[i] = None
     for i in range(len(trainings)):
         training_inst = trainings[i]
         print(f"-----------------------------Training Instance {i + 1}-----------------------------")
@@ -61,13 +65,24 @@ def back_propagation(reg_lambda, num_layers, thetas, trainings):
         delta = output - y
         print(f"----------Layer number (initial layer): {len(thetas) + 1}----------")
         print(f"delta: {delta}")
-        # since len thetas is 1 less than num layers, guaranteed to be for all layers after first
-        for k in range(len(thetas)-1, 0, -1):
+        all_deltas = [delta.copy()]
+        # since len thetas is 1 less than num layers, guaranteed to be for all layers L-1...2 (if start from 1)
+        for k in range(len(thetas) - 1, 0, -1):
             print(f"----------Layer number: {k + 1}----------")
             # remove first column of thetas, being the bias deltas.
             # Have to do this because using activations WITHOUT bias value=1, UNLIKE the pseudocode
             curr_theta = np.delete(thetas[k], [0], 1).T
             delta = np.matmul(curr_theta, delta) * activations[k] * (np.ones(activations[k].size) - activations[k])
+            all_deltas.append(np.array([delta.copy()]))
             print(f"delta: {delta}")
-
+        # activations will have 1 more than deltas, don't use final layer activation neurons
+        assert(len(all_deltas) == len(activations)-1)
+        # initialize accumulated gradients D, to ensure it has the right shape
+        delt = all_deltas[len(all_deltas)-1].T
+        act = activations[len(activations) - 2].T
+        accumulated_gradients = np.matmul(all_deltas[len(all_deltas)-1].T, np.array([activations[len(activations) - 2].T]))
+        print(accumulated_gradients)
+        # for k in range(num_layers - 2, 0, -1):
+        #    # accumulated_gradients += np.matmul(all_deltas[k], activations[k].T)
+        #     print(accumulated_gradients)
     return 0
