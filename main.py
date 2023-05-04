@@ -4,7 +4,7 @@ import NN
 
 def run_example(reg_lambda, structure, thetas, trainings):
     # NN.cost(reg_lambda, structure, thetas, trainings)
-    NN.back_propagation(reg_lambda, structure, thetas, trainings)
+    NN.back_propagation(1/(10**3), reg_lambda, structure, thetas, trainings)
     return 0
 
 

@@ -11,9 +11,10 @@ def forward_propagation(num_layers, thetas, training_inst, do_print):
     a = np.array(training_inst["x"])  # x is input, y is output
     assert (a.ndim == 1)  # ensure 'a' is always a vector. This is so that we know we don't need to transpose
     assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
-    activations = [a.copy()]
+    activations = []
     for k in range(0, num_layers - 1):  # k+2 is layer num if layers index from 1
         a = np.insert(a, 0, 1, axis=0)  # insert 1 in front of array, for inserting bias term
+        activations.append(np.array([a.copy()])) # force to be a row vector
         if do_print:
             print(f"a: {a}")
             print(f"----------Layer number: {k + 2}----------")
@@ -21,7 +22,8 @@ def forward_propagation(num_layers, thetas, training_inst, do_print):
         if do_print:
             print(f"z: {z}")
         a = sigmoid(z)
-        activations.append(a.copy())
+    # don't need bias for last one because not calculating gradient from last layer
+    activations.append(np.array([a.copy()]))
     return a, activations
 
 
@@ -50,8 +52,11 @@ def cost(reg_lambda, num_layers, thetas, trainings):
     return j_sum + S
 
 
+# alpha = 1/10^3
 # thetas: python list of numpy arrays,corresponding to each theta array
-def back_propagation(reg_lambda, num_layers, thetas, trainings):
+def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings):
+    print("----------------------------------------------Running back "
+          "propagation----------------------------------------------")
     assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     # TODO: add stopping criteria
     accumulated_gradients = {}
@@ -59,30 +64,41 @@ def back_propagation(reg_lambda, num_layers, thetas, trainings):
         accumulated_gradients[i] = None
     for i in range(len(trainings)):
         training_inst = trainings[i]
-        print(f"-----------------------------Training Instance {i + 1}-----------------------------")
+        print(f"-----------------------Training Instance {i + 1}-----------------------")
         output, activations = forward_propagation(num_layers, thetas, training_inst, False)
         y = np.array(training_inst["y"])
+        print("----------------Calculating Deltas----------------")
         delta = output - y
-        print(f"----------Layer number (initial layer): {len(thetas) + 1}----------")
-        print(f"delta: {delta}")
+        print(f"delta{len(thetas) + 1}: {delta}")
         all_deltas = [delta.copy()]
         # since len thetas is 1 less than num layers, guaranteed to be for all layers L-1...2 (if start from 1)
         for k in range(len(thetas) - 1, 0, -1):
-            print(f"----------Layer number: {k + 1}----------")
             # remove first column of thetas, being the bias deltas.
-            # Have to do this because using activations WITHOUT bias value=1, UNLIKE the pseudocode
-            curr_theta = np.delete(thetas[k], [0], 1).T
-            delta = np.matmul(curr_theta, delta) * activations[k] * (np.ones(activations[k].size) - activations[k])
-            all_deltas.append(np.array([delta.copy()]))
-            print(f"delta: {delta}")
-        # activations will have 1 more than deltas, don't use final layer activation neurons
-        assert(len(all_deltas) == len(activations)-1)
-        # initialize accumulated gradients D, to ensure it has the right shape
-        delt = all_deltas[len(all_deltas)-1].T
-        act = activations[len(activations) - 2].T
-        accumulated_gradients = np.matmul(all_deltas[len(all_deltas)-1].T, np.array([activations[len(activations) - 2].T]))
-        print(accumulated_gradients)
-        # for k in range(num_layers - 2, 0, -1):
-        #    # accumulated_gradients += np.matmul(all_deltas[k], activations[k].T)
-        #     print(accumulated_gradients)
+            delta = np.delete(np.matmul(thetas[k].T, delta) * activations[k]
+                              * (np.ones(activations[k].size) - activations[k]), 0)
+            all_deltas.append(np.array([delta.copy()]).T)  # specify as row vector, then transpose to get col
+            print(f"delta{k + 1}: {delta}")
+        # need to reverse because we added deltas backwards before so 0th index = deltas for last layer
+        all_deltas.reverse()
+        # activations will have 1 more than deltas, b/c use final layer activation neurons
+        assert (len(all_deltas) == len(activations) - 1)
+
+        print("---------------Computing Gradients---------------")
+        for k in range(num_layers - 2, -1, -1):  # num_layers - 2 means start from second to last layer (L-1)
+            new_gradient = np.matmul(all_deltas[k], activations[k])
+            print(f"theta{k+1}:\n {new_gradient}")
+            if accumulated_gradients[k] is None:
+                accumulated_gradients[k] = new_gradient
+            else:
+                accumulated_gradients[k] += new_gradient
+    print("-----------Training set finished processing. Compute average (regularized gradients)-----------")
+    n = len(trainings)
+    for k in range(num_layers - 2, -1, -1):
+        # computing regularizer
+        P = reg_lambda * thetas[k]
+        P[:, 0] = 0
+        accumulated_gradients[k] = (1/n) * (accumulated_gradients[k] + P)
+        print(f"theta{k+1}:\n {accumulated_gradients[k]}")
+    for k in range(num_layers - 2, -1, -1):
+        thetas[k] -= alpha * accumulated_gradients[k]
     return 0
