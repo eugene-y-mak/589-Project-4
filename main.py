@@ -1,10 +1,14 @@
+import sys
+
 import numpy as np
 import NN
 
 
 def run_example(reg_lambda, structure, thetas, trainings):
     # NN.cost(reg_lambda, structure, thetas, trainings)
-    NN.back_propagation(1/(10**3), reg_lambda, structure, thetas, trainings)
+
+    NN.back_propagation(1/(10**3), 10e-8, 1, reg_lambda, structure, thetas, trainings, True)
+   # NN.back_propagation(1/(10**3), 10e-8, sys.maxsize, reg_lambda, structure, thetas, trainings, False)
     return 0
 
 
