@@ -78,7 +78,7 @@ def back_propagation(alpha, epsilon, max_iterations, reg_lambda, num_layers, the
             if do_print: print("----------------Calculating Deltas----------------")
             delta = output - y
             if do_print: print(f"delta{len(thetas) + 1}: {delta}")
-            all_deltas = [delta.copy()]
+            all_deltas = [np.array([delta.copy()]).T]
             # since len thetas is 1 less than num layers, guaranteed to be for all layers L-1...2 (if start from 1)
             for k in range(len(thetas) - 1, 0, -1):
                 # remove first column of thetas, being the bias deltas.
