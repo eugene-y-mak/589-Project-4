@@ -19,8 +19,7 @@ def forward_propagation(num_layers, thetas, training_inst, do_print):
             print(f"a: {a}")
             print(f"----------Layer number: {k + 2}----------")
         z = np.matmul(thetas[k], a)
-        if do_print:
-            print(f"z: {z}")
+        if do_print: print(f"z: {z}")
         a = sigmoid(z)
     # don't need bias for last one because not calculating gradient from last layer
     activations.append(np.array([a.copy()]))
@@ -34,8 +33,9 @@ def cost(reg_lambda, num_layers, thetas, trainings, do_print):
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
         output, _ = forward_propagation(num_layers, thetas, training_inst, False)
         y = np.array(training_inst["y"])
-        if do_print: print(f"Predicted output: {output}")
-        if do_print: print(f"Expected output: {y}")
+        if do_print:
+            print(f"Predicted output: {output}")
+            print(f"Expected output: {y}")
         assert (y.ndim == 1)  # ensure training instance is just vector, since it's the last layer
         j = (-1 * y) * np.log(output) - ((np.ones(y.size) - y) * np.log(np.ones(y.size) - output))
         assert (j.ndim == 1)  # j should also be just a vector since y and output are vecs
@@ -75,10 +75,10 @@ def back_propagation(alpha, epsilon, max_iterations, reg_lambda, num_layers, the
             if do_print: print(f"-----------------------Training Instance {i + 1}-----------------------")
             output, activations = forward_propagation(num_layers, thetas, training_inst, False)
             y = np.array(training_inst["y"])
-            if do_print: print("----------------Calculating Deltas----------------")
+            if do_print: print("--------------Computing Deltas--------------")
             delta = output - y
             if do_print: print(f"delta{len(thetas) + 1}: {delta}")
-            all_deltas = [np.array([delta.copy()]).T] # ensure column vector!!
+            all_deltas = [np.array([delta.copy()]).T]  # ensure column vector!!
             # since len thetas is 1 less than num layers, guaranteed to be for all layers L-1...2 (if start from 1)
             for k in range(len(thetas) - 1, 0, -1):
                 # remove first column of thetas, being the bias deltas.
