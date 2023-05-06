@@ -3,16 +3,16 @@ import sys
 import numpy as np
 import NN
 
-EXAMPLE = 2
+EXAMPLE = 1
 
 
 def run_example(reg_lambda, structure, thetas, trainings):
     # for i in range(len(trainings)):
     #     NN.forward_propagation(structure, thetas, trainings[i], True)
     NN.cost(reg_lambda, structure, thetas, trainings, True)
-    NN.back_propagation(1 / (10 ** 3), 10e-8, 1, reg_lambda, structure, thetas, trainings, True)
+    NN.back_propagation(1 / (10 ** 3), reg_lambda, structure, thetas, trainings, True)
     # test of convergence
-    # NN.back_propagation(1/(10**3), 10e-8, sys.maxsize, reg_lambda, structure, thetas, trainings, False)
+    NN.train_NN(1/(10**3), 10e-8, reg_lambda, structure, thetas, trainings)
     return 0
 
 
