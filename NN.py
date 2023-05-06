@@ -27,11 +27,13 @@ def forward_propagation(num_layers, thetas, training_inst, do_print):
 
 
 def cost(reg_lambda, num_layers, thetas, trainings, do_print):
+    if do_print: print("-----------------------------------Computing error/cost J of the "
+                       "network----------------------------------------")
     j_sum = 0
     for i in range(len(trainings)):
         training_inst = trainings[i]
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
-        output, _ = forward_propagation(num_layers, thetas, training_inst, False)
+        output, _ = forward_propagation(num_layers, thetas, training_inst, do_print)
         y = np.array(training_inst["y"])
         if do_print:
             print(f"Predicted output: {output}")
