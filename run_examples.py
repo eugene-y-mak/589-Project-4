@@ -7,8 +7,6 @@ EXAMPLE = 1
 
 
 def run_example(reg_lambda, structure, thetas, trainings):
-    # for i in range(len(trainings)):
-    #     NN.forward_propagation(structure, thetas, trainings[i], True)
     NN.cost(reg_lambda, structure, thetas, trainings, True)
     NN.back_propagation(1 / (10 ** 3), reg_lambda, structure, thetas, trainings, True)
     # test of convergence

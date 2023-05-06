@@ -10,7 +10,7 @@ def forward_propagation(num_layers, thetas, training_inst, do_print):
     # initialize value of first neuron (a^l=1), first layer
     a = np.array(training_inst["x"])  # x is input, y is output
     assert (a.ndim == 1)  # ensure 'a' is always a vector. This is so that we know we don't need to transpose
-    assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
+    # assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     activations = []
     for k in range(0, num_layers - 1):  # k+2 is layer num if layers index from 1
         a = np.insert(a, 0, 1, axis=0)  # insert 1 in front of array, for inserting bias term
@@ -129,3 +129,26 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings):
         thetas = new_thetas
         iterations += 1
     return 0
+
+
+def make_random_weights(hidden_layer_structure, length_of_input, length_of_output):
+    # For thetas:
+    # num of rows = num of neurons in next layer
+    # num of cols = number of neurons for current layer + bias term
+    # first col is bias terms, then weights
+
+    thetas = []
+    # initial step with input layer:
+    assert(len(hidden_layer_structure) != 0)
+    thetas.append(np.random.rand(hidden_layer_structure[0], length_of_input + 1))
+    i = 0
+    while i < len(hidden_layer_structure) - 1:  # checking if i is the last hidden layer or not
+        thetas.append(np.random.rand(hidden_layer_structure[i+1], hidden_layer_structure[i] + 1))
+        i += 1
+
+    # final step with output layer
+    thetas.append(np.random.rand(length_of_output, hidden_layer_structure[i] + 1))
+    # should have same number of weights as all the layers (including input and output) minus 1,
+    # since don't need weights for output layer
+    assert(len(thetas) == len(hidden_layer_structure) + 1)
+    return thetas
