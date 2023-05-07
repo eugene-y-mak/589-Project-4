@@ -134,7 +134,7 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_la
         J = new_cost
         thetas = new_thetas
         iterations += 1
-    return 0
+    return thetas
 
 
 def make_random_weights(hidden_layer_structure, length_of_input, length_of_output):

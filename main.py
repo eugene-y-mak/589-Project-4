@@ -42,13 +42,12 @@ def main():
     train_set = pd.concat(train_set)
     input_labels = [col for col in train_set.columns if LABEL_HEADER not in col]
     output_labels = [col for col in train_set.columns if LABEL_HEADER in col]
-    NN.train_NN(alpha=1 / (10 ** 3), epsilon=10e-8, reg_lambda=0.25, num_layers=len(HIDDEN_LAYER_STRUCTURE)+2,
+    NN.train_NN(alpha=1 / (10 ** 3), epsilon=10e-4, reg_lambda=0.25, num_layers=len(HIDDEN_LAYER_STRUCTURE)+2,
                 thetas=thetas, trainings=train_set,
                 input_label=input_labels,
                 output_label=output_labels)
 
     # TODO:
-    #  5.) Once that works, test on house votes and check if cost is going down and is training
     #  6.) After that, setup prediction function using argmax of output of NN, checking with label
     return 0
 
