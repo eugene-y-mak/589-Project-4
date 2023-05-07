@@ -1,6 +1,8 @@
 import sys
 
 import numpy as np
+import pandas as pd
+
 import NN
 
 EXAMPLE = 1
@@ -8,10 +10,10 @@ EXAMPLE = 1
 
 def run_example(reg_lambda, structure, thetas, trainings):
     NN.cost(reg_lambda, structure, thetas, trainings, "x", "y", True)
-    NN.back_propagation(alpha=1 / (10 ** 3), reg_lambda=reg_lambda, num_layers=structure, thetas=thetas,
-                        trainings=trainings, input_label="x", output_label="y", do_print=True)
+   # NN.back_propagation(alpha=1 / (10 ** 3), reg_lambda=reg_lambda, num_layers=structure, thetas=thetas,
+    #                    trainings=trainings, input_label="x", output_label="y", do_print=True)
     # test of convergence
-    NN.train_NN(1/(10**3), 10e-8, reg_lambda, structure, thetas, trainings, "x", "y")
+    #NN.train_NN(1/(10**3), 10e-8, reg_lambda, structure, thetas, trainings, "x", "y")
     return 0
 
 
@@ -22,10 +24,14 @@ def main(example):
         # For thetas:
         # num of rows = num of neurons in next layer
         # first col is bias terms, then weights
+        data = {"x": [0.13000], "y": [0.90000]}, {"x": [0.42000], "y": [0.23000]}
+        df = pd.DataFrame(data)
+
         run_example(0.0, len([1, 2, 1]),
                     [np.array([[0.40000, 0.10000], [0.30000, 0.20000]]),  # theta 1
                      np.array([[0.70000, 0.50000, 0.60000]])],  # theta 2
-                    [{"x": [0.13000], "y": [0.90000]}, {"x": [0.42000], "y": [0.23000]}])
+                    df)
+
     elif example == 2:
         print("--------------------------------TESTING EXAMPLE 1--------------------------------")
         # -----------------Q2------------------------

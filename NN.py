@@ -8,7 +8,7 @@ def sigmoid(val): return 1 / (1 + math.e ** (-val))  # sigmoid function
 # computes final output for one training instance
 def forward_propagation(num_layers, thetas, training_inst, input_label, do_print):
     # initialize value of first neuron (a^l=1), first layer
-    a = np.array(training_inst[input_label])  # x is input, y is output
+    a = np.array(training_inst[0])  # x is input, y is output
     assert (a.ndim == 1)  # ensure 'a' is always a vector. This is so that we know we don't need to transpose
     # assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     activations = []
@@ -30,11 +30,11 @@ def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, d
     if do_print: print("-----------------------------------Computing error/cost J of the "
                        "network----------------------------------------")
     j_sum = 0
-    for i in range(len(trainings)):
-        training_inst = trainings[i]  # TODO: change to dataframe iloc iteration
+    i = 0
+    for training_inst in zip(trainings[input_label], trainings[output_label]):
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
         output, _ = forward_propagation(num_layers, thetas, training_inst, input_label, do_print)
-        y = np.array(training_inst[output_label])
+        y = np.array(training_inst[1])
         if do_print:
             print(f"Predicted output: {output}")
             print(f"Expected output: {y}")
@@ -44,6 +44,7 @@ def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, d
         j = np.sum(j)
         if do_print: print(f"Cost J: {j}")
         j_sum += j
+        i += 1
     n = len(trainings)
     j_sum /= n
     S = 0  # sum of squares of all weights of the network besides bias weights
