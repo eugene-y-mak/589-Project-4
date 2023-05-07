@@ -5,7 +5,7 @@ import pandas as pd
 
 import NN
 
-EXAMPLE = 1
+EXAMPLE = 2
 
 
 def run_example(reg_lambda, structure, thetas, trainings):
@@ -13,7 +13,7 @@ def run_example(reg_lambda, structure, thetas, trainings):
     NN.back_propagation(alpha=1 / (10 ** 3), reg_lambda=reg_lambda, num_layers=structure, thetas=thetas,
                         trainings=trainings, input_label="x", output_label="y", do_print=True)
     # test of convergence
-    NN.train_NN(1/(10**3), 10e-8, reg_lambda, structure, thetas, trainings, "x", "y")
+    # NN.train_NN(1/(10**3), 10e-8, reg_lambda, structure, thetas, trainings, "x", "y")
     return 0
 
 

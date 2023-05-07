@@ -2,13 +2,14 @@ import numpy as np
 import math
 import pandas as pd
 
+
 def sigmoid(val): return 1 / (1 + math.e ** (-val))  # sigmoid function
 
 
 # computes final output for one training instance
 def forward_propagation(training_inst, num_layers, thetas, do_print):
     # initialize value of first neuron (a^l=1), first layer
-    a = np.array(training_inst[0])  # x is input, y is output
+    a = training_inst  # x is input, y is output
     assert (a.ndim == 1)  # ensure 'a' is always a vector. This is so that we know we don't need to transpose
     # assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     activations = []
@@ -36,7 +37,7 @@ def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, d
     label_data = pd.Series((trainings[output_label]).values.tolist())
     for training_inst in zip(attribute_data, label_data):
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
-        output, _ = forward_propagation(training_inst, num_layers, thetas, do_print)
+        output, _ = forward_propagation(np.array(training_inst[0]), num_layers, thetas, do_print)
         y = np.array(training_inst[1])
         if do_print:
             print(f"Predicted output: {output}")
@@ -73,7 +74,7 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_lab
     label_data = pd.Series((trainings[output_label]).values.tolist())
     for training_inst in zip(attribute_data, label_data):
         if do_print: print(f"-----------------------Training Instance {inst_num}-----------------------")
-        output, activations = forward_propagation(training_inst, num_layers, thetas, False)
+        output, activations = forward_propagation(np.array(training_inst[0]), num_layers, thetas, False)
         y = np.array(training_inst[1])
         if do_print: print("--------------Computing Deltas--------------")
         delta = output - y
@@ -146,16 +147,16 @@ def make_random_weights(hidden_layer_structure, length_of_input, length_of_outpu
 
     thetas = []
     # initial step with input layer:
-    assert(len(hidden_layer_structure) != 0)
+    assert (len(hidden_layer_structure) != 0)
     thetas.append(np.random.rand(hidden_layer_structure[0], length_of_input + 1))
     i = 0
     while i < len(hidden_layer_structure) - 1:  # checking if i is the last hidden layer or not
-        thetas.append(np.random.rand(hidden_layer_structure[i+1], hidden_layer_structure[i] + 1))
+        thetas.append(np.random.rand(hidden_layer_structure[i + 1], hidden_layer_structure[i] + 1))
         i += 1
 
     # final step with output layer
     thetas.append(np.random.rand(length_of_output, hidden_layer_structure[i] + 1))
     # should have same number of weights as all the layers (including input and output) minus 1,
     # since don't need weights for output layer
-    assert(len(thetas) == len(hidden_layer_structure) + 1)
+    assert (len(thetas) == len(hidden_layer_structure) + 1)
     return thetas

@@ -13,7 +13,7 @@ POSSIBLE_CLASS_LABELS = helpers.get_attribute_values(MASTER_DATASET, LABEL_HEADE
 STR_CATEGORICALS = []
 K = 10
 HIDDEN_LAYER_STRUCTURE = [10, 15, 10]
-ALPHA = 1 / (10 ** 3)
+ALPHA = 1 / (10 ** 2)
 EPSILON = 10e-4
 REG_LAMBDA = 0.25
 
@@ -49,6 +49,10 @@ def main():
                               input_label=input_labels,
                               output_label=output_labels)
 
+    predictions = test_set.apply(sv.predict_with_NN, args=(input_labels, HIDDEN_LAYER_STRUCTURE, true_thetas,), axis=1)
+    actual = pd.Series((test_set[output_labels]).values.tolist())
+    assert len(actual) != 0
+    assert len(predictions) == len(actual)
     # TODO:
     #  1.) setup prediction function. Using best weights,
     #  run forward prop for every training instance using those weights.
