@@ -6,7 +6,7 @@ def sigmoid(val): return 1 / (1 + math.e ** (-val))  # sigmoid function
 
 
 # computes final output for one training instance
-def forward_propagation(num_layers, thetas, training_inst, input_label, do_print):
+def forward_propagation(num_layers, thetas, training_inst, do_print):
     # initialize value of first neuron (a^l=1), first layer
     a = np.array(training_inst[0])  # x is input, y is output
     assert (a.ndim == 1)  # ensure 'a' is always a vector. This is so that we know we don't need to transpose
@@ -33,7 +33,7 @@ def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, d
     i = 0
     for training_inst in zip(trainings[input_label], trainings[output_label]):
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
-        output, _ = forward_propagation(num_layers, thetas, training_inst, input_label, do_print)
+        output, _ = forward_propagation(num_layers, thetas, training_inst, do_print)
         y = np.array(training_inst[1])
         if do_print:
             print(f"Predicted output: {output}")
@@ -65,11 +65,11 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_lab
     accumulated_gradients = {}
     for i in range(len(thetas)):
         accumulated_gradients[i] = None
-    for i in range(len(trainings)):
-        training_inst = trainings[i]  # TODO: change to dataframe iloc iteration
-        if do_print: print(f"-----------------------Training Instance {i + 1}-----------------------")
-        output, activations = forward_propagation(num_layers, thetas, training_inst, input_label, False)
-        y = np.array(training_inst[output_label])
+    inst_num = 1
+    for training_inst in zip(trainings[input_label], trainings[output_label]):
+        if do_print: print(f"-----------------------Training Instance {inst_num}-----------------------")
+        output, activations = forward_propagation(num_layers, thetas, training_inst, False)
+        y = np.array(training_inst[1])
         if do_print: print("--------------Computing Deltas--------------")
         delta = output - y
         if do_print: print(f"delta{len(thetas) + 1}: {delta}")
@@ -93,6 +93,7 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_lab
                 accumulated_gradients[k] = new_gradient
             else:
                 accumulated_gradients[k] += new_gradient
+        inst_num += 1
     if do_print: print("-----------Training set finished processing. Compute average (regularized "
                        "gradients)-----------")
     n = len(trainings)
