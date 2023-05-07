@@ -6,9 +6,9 @@ def sigmoid(val): return 1 / (1 + math.e ** (-val))  # sigmoid function
 
 
 # computes final output for one training instance
-def forward_propagation(num_layers, thetas, training_inst, do_print):
+def forward_propagation(num_layers, thetas, training_inst, input_label, do_print):
     # initialize value of first neuron (a^l=1), first layer
-    a = np.array(training_inst["x"])  # x is input, y is output
+    a = np.array(training_inst[input_label])  # x is input, y is output
     assert (a.ndim == 1)  # ensure 'a' is always a vector. This is so that we know we don't need to transpose
     # assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     activations = []
@@ -26,15 +26,15 @@ def forward_propagation(num_layers, thetas, training_inst, do_print):
     return a, activations
 
 
-def cost(reg_lambda, num_layers, thetas, trainings, do_print):
+def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, do_print):
     if do_print: print("-----------------------------------Computing error/cost J of the "
                        "network----------------------------------------")
     j_sum = 0
     for i in range(len(trainings)):
-        training_inst = trainings[i]
+        training_inst = trainings[i]  # TODO: change to dataframe iloc iteration
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
-        output, _ = forward_propagation(num_layers, thetas, training_inst, do_print)
-        y = np.array(training_inst["y"])
+        output, _ = forward_propagation(num_layers, thetas, training_inst, input_label, do_print)
+        y = np.array(training_inst[output_label])
         if do_print:
             print(f"Predicted output: {output}")
             print(f"Expected output: {y}")
@@ -57,7 +57,7 @@ def cost(reg_lambda, num_layers, thetas, trainings, do_print):
 # alpha = 1/10^3
 # epsilon = 10e-3
 # thetas: python list of numpy arrays,corresponding to each theta array
-def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, do_print):
+def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_label, output_label, do_print):
     if do_print: print("----------------------------------------------Running back "
                        "propagation----------------------------------------------")
     # print(f"Diff: {diff}")
@@ -65,10 +65,10 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, do_print)
     for i in range(len(thetas)):
         accumulated_gradients[i] = None
     for i in range(len(trainings)):
-        training_inst = trainings[i]
+        training_inst = trainings[i]  # TODO: change to dataframe iloc iteration
         if do_print: print(f"-----------------------Training Instance {i + 1}-----------------------")
-        output, activations = forward_propagation(num_layers, thetas, training_inst, False)
-        y = np.array(training_inst["y"])
+        output, activations = forward_propagation(num_layers, thetas, training_inst, input_label, False)
+        y = np.array(training_inst[output_label])
         if do_print: print("--------------Computing Deltas--------------")
         delta = output - y
         if do_print: print(f"delta{len(thetas) + 1}: {delta}")
@@ -109,21 +109,21 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, do_print)
     for k in range(num_layers - 2, -1, -1):
         thetas[k] -= alpha * accumulated_gradients[k]
 
-    new_cost = cost(reg_lambda, num_layers, thetas, trainings, False)
-
+    new_cost = cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, False)
     return new_cost, thetas
 
 
-def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings):
+def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_label, output_label):
     assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     # stopping criteria:
     # cost function improves by less than epsilon e
-    J = cost(reg_lambda, num_layers, thetas, trainings, False)
+    J = cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, False)
     diff = float('inf')
     iterations = 0
     while diff > epsilon:
         print(f"Cost: {J}")
-        new_cost, new_thetas = back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, False)
+        new_cost, new_thetas = back_propagation(alpha, reg_lambda, num_layers, thetas,
+                                                trainings, input_label, output_label, False)
         diff = J - new_cost
         J = new_cost
         thetas = new_thetas
