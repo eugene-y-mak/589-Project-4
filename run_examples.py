@@ -5,7 +5,7 @@ import pandas as pd
 
 import NN
 
-EXAMPLE = 1
+EXAMPLE = 2
 
 
 def run_example(reg_lambda, structure, thetas, trainings):
@@ -24,7 +24,7 @@ def main(example):
         # For thetas:
         # num of rows = num of neurons in next layer
         # first col is bias terms, then weights
-        data = {"x": [0.13000], "y": [0.90000]}, {"x": [0.42000], "y": [0.23000]}
+        data = [{"x": [0.13000], "y": [0.90000]}, {"x": [0.42000], "y": [0.23000]}]
         df = pd.DataFrame(data)
 
         run_example(0.0, len([1, 2, 1]),
@@ -45,8 +45,8 @@ def main(example):
                                [0.03000, 0.56000, 0.80000, 0.69000, 0.09000]]),
                      np.array([[0.04000, 0.87000, 0.42000, 0.53000],  # theta 3
                                [0.17000, 0.10000, 0.95000, 0.69000]])],
-                    [{"x": [0.32000, 0.68000], "y": [0.75000, 0.98000]},
-                     {"x": [0.83000, 0.02000], "y": [0.75000, 0.28000]}])
+                    pd.DataFrame([{"x": [0.32000, 0.68000], "y": [0.75000, 0.98000]},
+                     {"x": [0.83000, 0.02000], "y": [0.75000, 0.28000]}]))
     return 0
 
 
