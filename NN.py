@@ -1,6 +1,6 @@
 import numpy as np
 import math
-
+import pandas as pd
 
 def sigmoid(val): return 1 / (1 + math.e ** (-val))  # sigmoid function
 
@@ -31,7 +31,9 @@ def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, d
                        "network----------------------------------------")
     j_sum = 0
     i = 0
-    for training_inst in zip(trainings[input_label], trainings[output_label]):
+    attribute_data = pd.Series((trainings[input_label]).values.tolist())
+    label_data = pd.Series((trainings[output_label]).values.tolist())
+    for training_inst in zip(attribute_data, label_data):
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
         output, _ = forward_propagation(num_layers, thetas, training_inst, do_print)
         y = np.array(training_inst[1])
@@ -66,7 +68,9 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_lab
     for i in range(len(thetas)):
         accumulated_gradients[i] = None
     inst_num = 1
-    for training_inst in zip(trainings[input_label], trainings[output_label]):
+    attribute_data = pd.Series((trainings[input_label]).values.tolist())
+    label_data = pd.Series((trainings[output_label]).values.tolist())
+    for training_inst in zip(attribute_data, label_data):
         if do_print: print(f"-----------------------Training Instance {inst_num}-----------------------")
         output, activations = forward_propagation(num_layers, thetas, training_inst, False)
         y = np.array(training_inst[1])
