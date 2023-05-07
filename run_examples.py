@@ -3,19 +3,20 @@ import sys
 import numpy as np
 import NN
 
-EXAMPLE = 1
+EXAMPLE = 2
 
 
 def run_example(reg_lambda, structure, thetas, trainings):
     NN.cost(reg_lambda, structure, thetas, trainings, True)
     NN.back_propagation(1 / (10 ** 3), reg_lambda, structure, thetas, trainings, True)
     # test of convergence
-    NN.train_NN(1/(10**3), 10e-8, reg_lambda, structure, thetas, trainings)
+    #NN.train_NN(1/(10**3), 10e-8, reg_lambda, structure, thetas, trainings)
     return 0
 
 
-def main():
-    if EXAMPLE == 1:
+def main(example):
+    if example == 1:
+        print("--------------------------------TESTING EXAMPLE 1--------------------------------")
         # -----------------Q1-------------------------
         # For thetas:
         # num of rows = num of neurons in next layer
@@ -24,7 +25,8 @@ def main():
                     [np.array([[0.40000, 0.10000], [0.30000, 0.20000]]),  # theta 1
                      np.array([[0.70000, 0.50000, 0.60000]])],  # theta 2
                     [{"x": [0.13000], "y": [0.90000]}, {"x": [0.42000], "y": [0.23000]}])
-    elif EXAMPLE == 2:
+    elif example == 2:
+        print("--------------------------------TESTING EXAMPLE 1--------------------------------")
         # -----------------Q2------------------------
         run_example(0.250, len([2, 4, 3, 2]),
                     [np.array([[0.42000, 0.15000, 0.40000],  # theta 1
@@ -42,4 +44,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(EXAMPLE)

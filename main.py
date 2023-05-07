@@ -20,19 +20,23 @@ def main():
     column_names = MASTER_DATASET.columns.to_numpy().copy()
     all_attributes = np.delete(column_names, np.where(column_names == LABEL_HEADER))
     normalized_df = helpers.normalize_dataset(MASTER_DATASET)
-    # create folds
+    # preprocess dataset to convert labels to one hot encoding
+    normalized_encoded_df = helpers.encode_attribute(normalized_df, LABEL_HEADER)
+    print(normalized_encoded_df)
+    # create folds TODO: OH GOD THIS MIGHT NOT WORK WITH OHE
     folds = sv.create_k_folds(K, normalized_df, POSSIBLE_CLASS_LABELS, LABEL_HEADER)
     assert K == len(folds)
 
-    # preprocess dataset to convert labels to one hot encoding
+
 
     # input layer length must be equal to number of attributes
     # output layer length must be equal to number of classes
     num_layers = len(HIDDEN_LAYER_STRUCTURE) + 2  # add 2 more for input and output
     thetas = NN.make_random_weights(HIDDEN_LAYER_STRUCTURE, len(all_attributes), len(POSSIBLE_CLASS_LABELS))
 
-    # TODO:
+
     #  1.) one hot encode the labels... using scikit or numpy get_dummies
+    # TODO:
     #  2.) change NN processing to take in a dataframe, not hashmap. Label header
     #  becomes "y", everything else in that row becomes the input "x".
     #  Question: if label column becomes multiple from ohe, how to handle?

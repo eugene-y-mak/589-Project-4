@@ -1,13 +1,11 @@
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
+import pandas as pd
 
 
-def encode_attribute(dataset, column_names, numericals):
-    ohe = OneHotEncoder()
-    for column in column_names:  # importantly: INCLUDES processing class label
-        if column not in numericals:
-            dataset[column] = ohe.fit_transform(dataset[column])  # TODO: FIX
-    return 0
+def encode_attribute(dataset, header_name):
+    #return pd.get_dummies(dataset[header_name], prefix=header_name, dtype=int)
+    return pd.get_dummies(dataset, columns=[header_name], dtype=int)
 
 
 def normalize_dataset(df):  # normalizes and does one hot encoding
