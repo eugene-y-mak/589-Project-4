@@ -10,12 +10,12 @@ def encode_attribute(dataset, column_names, numericals):
     return 0
 
 
-def preprocess_for_NN(df, numericals):  # normalizes and does one hot encoding
+def normalize_dataset(df):  # normalizes and does one hot encoding
     normalized_df = (df - df.min()) / (df.max() - df.min())
     return normalized_df
 
 
-# gets all possible unique values from given attribute header/name in full dataset. Mainly for categorical
+# gets all possible unique values from given attribute header/name in full dataset.
 def get_attribute_values(master_dataset, label_header):
     return np.unique(master_dataset.loc[:, label_header])  # guaranteed to be sorted!
 
