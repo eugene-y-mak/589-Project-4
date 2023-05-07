@@ -49,7 +49,7 @@ def create_k_folds(k, dataset, possible_class_labels, label_header):
 # uses forward prop to make a prediction
 def predict_with_NN(row, input_labels, structure, true_thetas):
     training_inst = row[input_labels].to_numpy()
-    output, _ = NN.forward_propagation(training_inst, len(structure), true_thetas, False)
+    output, _ = NN.forward_propagation(training_inst, len(structure)+2, true_thetas, False)
     return output
 
 
