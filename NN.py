@@ -31,6 +31,7 @@ def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, d
                        "network----------------------------------------")
     j_sum = 0
     i = 0
+    # Convert dataframe columns of input or output label(s) to a series of df rows in form of lists
     attribute_data = pd.Series((trainings[input_label]).values.tolist())
     label_data = pd.Series((trainings[output_label]).values.tolist())
     for training_inst in zip(attribute_data, label_data):

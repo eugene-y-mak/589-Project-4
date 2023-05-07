@@ -13,18 +13,18 @@ POSSIBLE_CLASS_LABELS = helpers.get_attribute_values(MASTER_DATASET, LABEL_HEADE
 NUMERICALS = []
 K = 10
 HIDDEN_LAYER_STRUCTURE = [10, 15, 10]
-
+ALPHA = 1 / (10 ** 2)
+EPSILON = 10e-4
+REG_LAMBDA = 0.25
 
 def main():
     column_names = MASTER_DATASET.columns.to_numpy().copy()
     all_attributes = np.delete(column_names, np.where(column_names == LABEL_HEADER))
     normalized_df = helpers.normalize_dataset(MASTER_DATASET)
-
-    # normalized_encoded_df = helpers.encode_attribute(normalized_df, LABEL_HEADER)
     # create folds
     folds = sv.create_k_folds(K, normalized_df, POSSIBLE_CLASS_LABELS, LABEL_HEADER)
 
-    # after making folds, process each one to have one hot encoding class labels for training later
+    # after making folds, process each one to have one hot encoding class labels for training
     for i in range(len(folds)):
         folds[i] = helpers.encode_attribute(folds[i], LABEL_HEADER)
     assert K == len(folds)
@@ -42,13 +42,17 @@ def main():
     train_set = pd.concat(train_set)
     input_labels = [col for col in train_set.columns if LABEL_HEADER not in col]
     output_labels = [col for col in train_set.columns if LABEL_HEADER in col]
-    NN.train_NN(alpha=1 / (10 ** 3), epsilon=10e-4, reg_lambda=0.25, num_layers=len(HIDDEN_LAYER_STRUCTURE)+2,
-                thetas=thetas, trainings=train_set,
-                input_label=input_labels,
-                output_label=output_labels)
+    true_thetas = NN.train_NN(alpha=ALPHA, epsilon=EPSILON, reg_lambda=REG_LAMBDA,
+                              num_layers=len(HIDDEN_LAYER_STRUCTURE) + 2,
+                              thetas=thetas, trainings=train_set,
+                              input_label=input_labels,
+                              output_label=output_labels)
 
     # TODO:
-    #  6.) After that, setup prediction function using argmax of output of NN, checking with label
+    #  1.) setup prediction function. Using best weights,
+    #  run forward prop for every training instance using those weights.
+    #  For each run, check prediction, apply argmax, check with label.
+    #  2.) When checking with label, need to figure out how to check for TP vs FP
     return 0
 
 
