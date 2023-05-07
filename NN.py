@@ -6,7 +6,7 @@ def sigmoid(val): return 1 / (1 + math.e ** (-val))  # sigmoid function
 
 
 # computes final output for one training instance
-def forward_propagation(num_layers, thetas, training_inst, do_print):
+def forward_propagation(training_inst, num_layers, thetas, do_print):
     # initialize value of first neuron (a^l=1), first layer
     a = np.array(training_inst[0])  # x is input, y is output
     assert (a.ndim == 1)  # ensure 'a' is always a vector. This is so that we know we don't need to transpose
@@ -36,7 +36,7 @@ def cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, d
     label_data = pd.Series((trainings[output_label]).values.tolist())
     for training_inst in zip(attribute_data, label_data):
         if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
-        output, _ = forward_propagation(num_layers, thetas, training_inst, do_print)
+        output, _ = forward_propagation(training_inst, num_layers, thetas, do_print)
         y = np.array(training_inst[1])
         if do_print:
             print(f"Predicted output: {output}")
@@ -73,7 +73,7 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_lab
     label_data = pd.Series((trainings[output_label]).values.tolist())
     for training_inst in zip(attribute_data, label_data):
         if do_print: print(f"-----------------------Training Instance {inst_num}-----------------------")
-        output, activations = forward_propagation(num_layers, thetas, training_inst, False)
+        output, activations = forward_propagation(training_inst, num_layers, thetas, False)
         y = np.array(training_inst[1])
         if do_print: print("--------------Computing Deltas--------------")
         delta = output - y

@@ -4,7 +4,6 @@ import pandas as pd
 
 
 def encode_attribute(dataset, header_name):
-    #return pd.get_dummies(dataset[header_name], prefix=header_name, dtype=int)
     return pd.get_dummies(dataset, columns=[header_name], dtype=int)
 
 

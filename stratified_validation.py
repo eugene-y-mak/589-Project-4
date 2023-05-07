@@ -1,5 +1,6 @@
 import sklearn
 import pandas as pd
+import NN
 
 
 def separate_dataset_by_class(dataset, total_count, possible_class_labels, label_header):
@@ -45,5 +46,29 @@ def create_k_folds(k, dataset, possible_class_labels, label_header):
     return folds
 
 
-def evaluate_NN():
+def evaluate_NN(label_header, K, folds, structure, alpha, epsilon, reg_lambda, thetas):
+    accuracies = 0
+    recalls = 0
+    precisions = 0
+    F1s = 0
+    for i in range(K):
+        test_set = folds[i]
+        train_set = []
+        for j in range(K):
+            if j != i:  # concat all datasets except ith
+                train_set.append(folds[j])
+        train_set = pd.concat(train_set)
+        input_labels = [col for col in train_set.columns if label_header not in col]
+        output_labels = [col for col in train_set.columns if label_header in col]
+        # ----train the model-----
+        true_thetas = NN.train_NN(alpha=alpha, epsilon=epsilon, reg_lambda=reg_lambda,
+                                  num_layers=len(structure) + 2,
+                                  thetas=thetas, trainings=train_set,
+                                  input_label=input_labels,
+                                  output_label=output_labels)
+        # ----evaluate model------
+        predictions = test_set.apply(NN.forward_propagation, args=(structure, true_thetas, False,), axis=1)
+        actual = pd.Series((test_set[output_labels]).values.tolist())
+        assert len(actual) != 0
+        assert len(predictions) == len(actual)
     return 0

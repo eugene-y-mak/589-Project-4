@@ -10,12 +10,13 @@ LABEL_HEADER = 'class'
 MASTER_DATASET = pd.read_csv(CSV)
 MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
 POSSIBLE_CLASS_LABELS = helpers.get_attribute_values(MASTER_DATASET, LABEL_HEADER)
-NUMERICALS = []
+STR_CATEGORICALS = []
 K = 10
 HIDDEN_LAYER_STRUCTURE = [10, 15, 10]
-ALPHA = 1 / (10 ** 2)
+ALPHA = 1 / (10 ** 3)
 EPSILON = 10e-4
 REG_LAMBDA = 0.25
+
 
 def main():
     column_names = MASTER_DATASET.columns.to_numpy().copy()
@@ -28,7 +29,7 @@ def main():
     for i in range(len(folds)):
         folds[i] = helpers.encode_attribute(folds[i], LABEL_HEADER)
     assert K == len(folds)
-
+    # TODO: for CMC EC, one hot encode for categoricals with string elements
     # input layer length must be equal to number of attributes
     # output layer length must be equal to number of classes
     num_layers = len(HIDDEN_LAYER_STRUCTURE) + 2  # add 2 more for input and output
