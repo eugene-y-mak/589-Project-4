@@ -58,11 +58,8 @@ def predict_with_NN(row, input_labels, num_layers, true_thetas):
 
 def evaluate_NN(label_header, K, folds, hidden_layer_structure, alpha, epsilon, reg_lambda):
     accuracies = 0
-    recalls = 0
-    precisions = 0
     F1s = 0
     for i in range(K):
-
         test_set = folds[i]
         train_set = []
         for j in range(K):
@@ -73,24 +70,42 @@ def evaluate_NN(label_header, K, folds, hidden_layer_structure, alpha, epsilon, 
         # output layer length must be equal to number of classes
         input_labels = [col for col in train_set.columns if label_header not in col]
         output_labels = [col for col in train_set.columns if label_header in col]
+        # make new thetas here so that we don't reuse the same thetas everytime
         thetas = NN.make_random_weights(hidden_layer_structure, len(input_labels), len(output_labels))
-        num_layers = len(hidden_layer_structure) + 2 # add 2 more for input and output
+        num_layers = len(hidden_layer_structure) + 2  # add 2 more for input and output
         # ----train the model-----
         true_thetas = NN.train_NN(alpha=alpha, epsilon=epsilon, reg_lambda=reg_lambda, num_layers=num_layers,
                                   thetas=thetas, trainings=train_set, input_label=input_labels,
                                   output_label=output_labels)
+
         # ----evaluate model------
         predictions = test_set.apply(predict_with_NN, args=(input_labels, num_layers, true_thetas,), axis=1)
         actual = pd.Series((test_set[output_labels]).values.tolist())
         assert len(actual) != 0
         assert len(predictions) == len(actual)
-        correct_predicts = 0
-        for (a, p) in zip(actual, predictions):
-            predicted_class_index = np.argmax(p)
-            actual_class_index = np.argmax(a)
-            if predicted_class_index == actual_class_index:
-                correct_predicts += 1
-
-        print(f"Correct_predicts: {correct_predicts}, total: {len(actual)}, Accuracy: {correct_predicts / len(actual)}")
-        accuracies += correct_predicts / len(actual)
-    return accuracies / K
+        # ---------------------------METRICS--------------------------
+        num_classes = len(output_labels)
+        if num_classes > 2:  # if multiclass
+            accuracy = 0
+            F1 = 0
+            # NOTE: np.unique(actual) should HOPEFULLY always return all classes
+            for argmax_index in range(3):
+                acc, f1 = helpers.calculate_metrics(actual, predictions, argmax_index)
+                accuracy += acc
+                F1 += f1
+            # averaging metrics for every possible class being the positive one
+            accuracy /= num_classes
+            F1 /= num_classes
+        else:
+            accuracy, F1 = helpers.calculate_metrics(actual, predictions, 0)
+        # print(accuracy)
+        accuracies += accuracy
+        F1s += F1
+        # correct_predicts = 0
+        # for (a, p) in zip(actual, predictions):
+        #     predicted_class_index = np.argmax(p)
+        #     actual_class_index = np.argmax(a)
+        #     if predicted_class_index == actual_class_index:
+        #         correct_predicts += 1
+        # print(f"Correct_predicts: {correct_predicts}, total: {len(actual)}, Accuracy: {correct_predicts / len(actual)}")
+    return (accuracies / K), (F1s / K)

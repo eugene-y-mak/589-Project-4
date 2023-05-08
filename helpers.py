@@ -27,14 +27,18 @@ def calculate_metrics(actual, predictions, positive_class_label):
     precision = 0
     recall = 0
     F1 = 0
-    for index in actual.index:
-        if actual[index] == positive_class_label:
-            if actual[index] == predictions[index]:
+    for (a, p) in zip(actual, predictions):
+        predicted_class_index = np.argmax(p)
+        prediction_array = np.zeros(3)
+        prediction_array[predicted_class_index] = 1
+        actual_class_index = np.argmax(a)
+        if actual_class_index == positive_class_label:
+            if predicted_class_index == actual_class_index:
                 TP += 1
             else:
                 FN += 1
         else:
-            if actual[index] == predictions[index]:
+            if predicted_class_index == actual_class_index:
                 TN += 1
             else:
                 FP += 1
