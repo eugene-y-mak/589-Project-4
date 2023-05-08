@@ -9,7 +9,25 @@ import stratified_validation as sv
 # wine -- 0
 # house -- 1
 # cancer -- 2
-DATA = 1
+DATA = 0
+
+# structures to test:
+# [4] lambda=0
+# [8] lambda=0
+# [16] lambda=0
+# [32] lambda=0
+# [8, 4] lambda=0
+# [4, 8] lambda=0
+# [32, 16] lambda=0
+# [16, 32] lambda=0
+# [8, 4, 2] lambda=0
+# [2, 4, 8] lambda=0
+# [16, 8, 4, 2] lambda=0
+
+# [8] lambda = 0.25
+# [8, 4] lambda = 0.25
+# [8] lambda = 0.5? or 1
+# [8, 4] lambda = 0.5 or 1
 
 if DATA == 0:
     # ------------- For Wine Dataset --------------------- (for later, make these arguments)
@@ -40,6 +58,18 @@ elif DATA == 1:
     EPOCHS = 500  # unused, for now
     REG_LAMBDA = 0
 
+elif DATA == 2:
+    CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_cancer.csv"
+    NAME = "Cancer"
+    LABEL_HEADER = 'Class'
+    MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
+    MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
+    CATEGORICALS = []
+    K = 10
+    HIDDEN_LAYER_STRUCTURE = [8]
+    ALPHA = 1
+    EPSILON = 10e-7
+    REG_LAMBDA = 0
 
 def main():
     # normalize data
