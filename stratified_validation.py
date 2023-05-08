@@ -68,10 +68,8 @@ def evaluate_NN(label_header, K, folds, structure, alpha, epsilon, reg_lambda, t
         input_labels = [col for col in train_set.columns if label_header not in col]
         output_labels = [col for col in train_set.columns if label_header in col]
         # ----train the model-----
-        true_thetas = NN.train_NN(alpha=alpha, epsilon=epsilon, reg_lambda=reg_lambda,
-                                  num_layers=len(structure) + 2,
-                                  thetas=thetas, trainings=train_set,
-                                  input_label=input_labels,
+        true_thetas = NN.train_NN(alpha=alpha, epsilon=epsilon, reg_lambda=reg_lambda, num_layers=len(structure) + 2,
+                                  thetas=thetas, trainings=train_set, input_label=input_labels,
                                   output_label=output_labels)
         # ----evaluate model------
         predictions = test_set.apply(NN.forward_propagation, args=(structure, true_thetas, False,), axis=1)

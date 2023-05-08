@@ -4,18 +4,24 @@ import helpers
 import numpy as np
 import stratified_validation as sv
 
-CSV = 'datasets/hw3_house_votes_84.csv'
-NAME = "House Votes"
-LABEL_HEADER = 'class'
-MASTER_DATASET = pd.read_csv(CSV)
+# ------------- For Wine Dataset --------------------- (for later, make these arguments)
+CSV = 'datasets/hw3_wine.csv'
+NAME = "Wine"
+LABEL_HEADER = '# class'
+MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
+
+# CSV = 'datasets/hw3_house_votes_84.csv'
+# NAME = "House Votes"
+# LABEL_HEADER = 'class'
+# MASTER_DATASET = pd.read_csv(CSV)
 MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
 POSSIBLE_CLASS_LABELS = helpers.get_attribute_values(MASTER_DATASET, LABEL_HEADER)
 STR_CATEGORICALS = []
 K = 10
-HIDDEN_LAYER_STRUCTURE = [10, 15, 10]
+HIDDEN_LAYER_STRUCTURE = [7, 7]
 ALPHA = 1 / (10 ** 3)
 EPSILON = 10e-3
-REG_LAMBDA = 0.25
+REG_LAMBDA = 0
 
 
 def main():
@@ -44,10 +50,8 @@ def main():
     input_labels = [col for col in train_set.columns if LABEL_HEADER not in col]
     output_labels = [col for col in train_set.columns if LABEL_HEADER in col]
     true_thetas = NN.train_NN(alpha=ALPHA, epsilon=EPSILON, reg_lambda=REG_LAMBDA,
-                              num_layers=len(HIDDEN_LAYER_STRUCTURE) + 2,
-                              thetas=thetas, trainings=train_set,
-                              input_label=input_labels,
-                              output_label=output_labels)
+                              num_layers=len(HIDDEN_LAYER_STRUCTURE) + 2, thetas=thetas, trainings=train_set,
+                              input_label=input_labels, output_label=output_labels)
 
     predictions = test_set.apply(sv.predict_with_NN, args=(input_labels, HIDDEN_LAYER_STRUCTURE, true_thetas,), axis=1)
     actual = pd.Series((test_set[output_labels]).values.tolist())

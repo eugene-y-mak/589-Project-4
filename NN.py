@@ -121,14 +121,14 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_lab
     return new_cost, thetas
 
 
-def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_label, output_label):
+def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_label, output_label, max_iterations=500):
     assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     # stopping criteria:
     # cost function improves by less than epsilon e
     J = cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, False)
     diff = float('inf')
     iterations = 0
-    while diff > epsilon:
+    while diff > epsilon and iterations < max_iterations:
         print(f"Cost: {J}")
         new_cost, new_thetas = back_propagation(alpha, reg_lambda, num_layers, thetas,
                                                 trainings, input_label, output_label, False)
