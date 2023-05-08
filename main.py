@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import NN
 import helpers
@@ -7,11 +9,12 @@ import stratified_validation as sv
 # wine -- 0
 # house -- 1
 # cancer -- 2
-DATA = 0
+DATA = 1
 
 if DATA == 0:
     # ------------- For Wine Dataset --------------------- (for later, make these arguments)
-    CSV = 'datasets/hw3_wine.csv'
+    #CSV = 'datasets/hw3_wine.csv'
+    CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_wine.csv"
     NAME = "Wine"
     LABEL_HEADER = '# class'
     MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
@@ -24,7 +27,8 @@ if DATA == 0:
     REG_LAMBDA = 0
 
 elif DATA == 1:
-    CSV = 'datasets/hw3_house_votes_84.csv'
+    #CSV = 'datasets/hw3_house_votes_84.csv'
+    CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_house_votes_84.csv"
     NAME = "House Votes"
     LABEL_HEADER = 'class'
     MASTER_DATASET = pd.read_csv(CSV)
@@ -32,8 +36,8 @@ elif DATA == 1:
     K = 10
     HIDDEN_LAYER_STRUCTURE = [16]
     ALPHA = 2
-    EPSILON = -float('inf')  # 10e-8 -float('inf')
-    EPOCHS = 500 # unused, for now
+    EPSILON = 10e-8  # 10e-8 -float('inf')
+    EPOCHS = 500  # unused, for now
     REG_LAMBDA = 0
 
 

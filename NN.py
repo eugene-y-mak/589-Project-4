@@ -134,7 +134,7 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_la
         # print(f"Cost: {J}")
         new_cost, new_thetas = back_propagation(alpha, reg_lambda, num_layers, thetas,
                                                 trainings, input_label, output_label, False)
-        diff = J - new_cost
+        diff = abs(J - new_cost)
         J = new_cost
         thetas = new_thetas
         iterations += 1
