@@ -24,7 +24,7 @@ def forward_propagation(training_inst, num_layers, thetas, do_print):
         a = sigmoid(z)
     # don't need bias for last one because not calculating gradient from last layer
     activations.append(np.array([a.copy()]))
-    #print(a)
+    # print(a)
     return a, activations
 
 
@@ -127,37 +127,41 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_la
     # stopping criteria:
     # cost function improves by less than epsilon e
     J = cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, False)
+    print(f"Initial cost: {J}")
     diff = float('inf')
     iterations = 0
     while diff > epsilon and iterations < max_iterations:
-        print(f"Cost: {J}")
+        # print(f"Cost: {J}")
         new_cost, new_thetas = back_propagation(alpha, reg_lambda, num_layers, thetas,
                                                 trainings, input_label, output_label, False)
         diff = J - new_cost
         J = new_cost
         thetas = new_thetas
         iterations += 1
+    print(f"Final cost: {J}")
     return thetas
 
 
-# TODO: generate numbers between -1 to 1, not 0 to 1
 def make_random_weights(hidden_layer_structure, length_of_input, length_of_output):
     # For thetas:
     # num of rows = num of neurons in next layer
     # num of cols = number of neurons for current layer + bias term
     # first col is bias terms, then weights
+    max_val, min_val = 1, -1
+    range_size = (max_val - min_val)  # 2
 
     thetas = []
     # initial step with input layer:
     assert (len(hidden_layer_structure) != 0)
-    thetas.append(np.random.rand(hidden_layer_structure[0], length_of_input + 1))
+    thetas.append(np.random.rand(hidden_layer_structure[0], length_of_input + 1) * range_size + min_val)
     i = 0
     while i < len(hidden_layer_structure) - 1:  # checking if i is the last hidden layer or not
-        thetas.append(np.random.rand(hidden_layer_structure[i + 1], hidden_layer_structure[i] + 1))
+        thetas.append(
+            np.random.rand(hidden_layer_structure[i + 1], hidden_layer_structure[i] + 1) * range_size + min_val)
         i += 1
 
     # final step with output layer
-    thetas.append(np.random.rand(length_of_output, hidden_layer_structure[i] + 1))
+    thetas.append(np.random.rand(length_of_output, hidden_layer_structure[i] + 1) * range_size + min_val)
     # should have same number of weights as all the layers (including input and output) minus 1,
     # since don't need weights for output layer
     assert (len(thetas) == len(hidden_layer_structure) + 1)

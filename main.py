@@ -4,24 +4,38 @@ import helpers
 import numpy as np
 import stratified_validation as sv
 
-# ------------- For Wine Dataset --------------------- (for later, make these arguments)
-CSV = 'datasets/hw3_wine.csv'
-NAME = "Wine"
-LABEL_HEADER = '# class'
-MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
+# wine -- 0
+# house -- 1
+# cancer -- 2
+DATA = 0
 
-# CSV = 'datasets/hw3_house_votes_84.csv'
-# NAME = "House Votes"
-# LABEL_HEADER = 'class'
-# MASTER_DATASET = pd.read_csv(CSV)
-MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
-CATEGORICALS = []
-K = 10
-HIDDEN_LAYER_STRUCTURE = [8]
-#ALPHA = 1 / (10 ** 2)
-ALPHA = 1
-EPSILON = 10e-8
-REG_LAMBDA = 0
+if DATA == 0:
+    # ------------- For Wine Dataset --------------------- (for later, make these arguments)
+    CSV = 'datasets/hw3_wine.csv'
+    NAME = "Wine"
+    LABEL_HEADER = '# class'
+    MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
+    MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
+    CATEGORICALS = []
+    K = 10
+    # 1 layer:
+    # 8 is good, >8 is HORRIBLE??
+    HIDDEN_LAYER_STRUCTURE = [8]
+    ALPHA = 1
+    EPSILON = 10e-7
+    REG_LAMBDA = 0
+
+elif DATA == 1:
+    CSV = 'datasets/hw3_house_votes_84.csv'
+    NAME = "House Votes"
+    LABEL_HEADER = 'class'
+    MASTER_DATASET = pd.read_csv(CSV)
+    CATEGORICALS = []
+    K = 10
+    HIDDEN_LAYER_STRUCTURE = [16]
+    ALPHA = 2
+    EPSILON = -float('inf')  # 10e-8 -float('inf')
+    REG_LAMBDA = 0
 
 
 def main():
@@ -38,34 +52,8 @@ def main():
         folds[i] = helpers.encode_attribute(folds[i], LABEL_HEADER)
     assert K == len(folds)
     # TODO: for CMC EC, one hot encode for categoricals with string elements
-    # input layer length must be equal to number of attributes
-    # output layer length must be equal to number of classes
-    num_layers = len(HIDDEN_LAYER_STRUCTURE) + 2  # add 2 more for input and output
-    thetas = NN.make_random_weights(HIDDEN_LAYER_STRUCTURE, len(all_attributes), len(possible_class_labels))
 
-    # TODO: fix this later obv, don't just use 1 fold iteration
-    test_set = folds[0]
-    train_set = []
-    for i in range(1, len(folds)):
-        train_set.append(folds[i])
-    train_set = pd.concat(train_set)
-    input_labels = [col for col in train_set.columns if LABEL_HEADER not in col]
-    output_labels = [col for col in train_set.columns if LABEL_HEADER in col]
-    true_thetas = NN.train_NN(alpha=ALPHA, epsilon=EPSILON, reg_lambda=REG_LAMBDA,
-                              num_layers=num_layers, thetas=thetas, trainings=train_set,
-                              input_label=input_labels, output_label=output_labels)
-
-    predictions = test_set.apply(sv.predict_with_NN, args=(input_labels, num_layers, true_thetas,), axis=1)
-    actual = pd.Series((test_set[output_labels]).values.tolist())
-    assert len(actual) != 0
-    assert len(predictions) == len(actual)
-    accuracy = 0
-    for (a, p) in zip(actual, predictions):
-        predicted_class_index = np.argmax(p)
-        actual_class_index = np.argmax(a)
-        if predicted_class_index == actual_class_index:
-            accuracy += 1
-    print(accuracy/len(actual))
+    print(f"Final accuracy: {sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)}")
     # TODO:
     #  2.) When checking with label, need to figure out how to check for TP vs FP
     return 0

@@ -2,6 +2,7 @@ import sklearn
 import pandas as pd
 import NN
 import helpers
+import numpy as np
 
 
 def separate_dataset_by_class(dataset, total_count, possible_class_labels, label_header):
@@ -55,27 +56,41 @@ def predict_with_NN(row, input_labels, num_layers, true_thetas):
     return output
 
 
-def evaluate_NN(label_header, K, folds, structure, alpha, epsilon, reg_lambda, thetas):
+def evaluate_NN(label_header, K, folds, hidden_layer_structure, alpha, epsilon, reg_lambda):
     accuracies = 0
     recalls = 0
     precisions = 0
     F1s = 0
     for i in range(K):
+
         test_set = folds[i]
         train_set = []
         for j in range(K):
             if j != i:  # concat all datasets except ith
                 train_set.append(folds[j])
         train_set = pd.concat(train_set)
+        # input layer length must be equal to number of attributes
+        # output layer length must be equal to number of classes
         input_labels = [col for col in train_set.columns if label_header not in col]
         output_labels = [col for col in train_set.columns if label_header in col]
+        thetas = NN.make_random_weights(hidden_layer_structure, len(input_labels), len(output_labels))
+        num_layers = len(hidden_layer_structure) + 2 # add 2 more for input and output
         # ----train the model-----
-        true_thetas = NN.train_NN(alpha=alpha, epsilon=epsilon, reg_lambda=reg_lambda, num_layers=len(structure) + 2,
+        true_thetas = NN.train_NN(alpha=alpha, epsilon=epsilon, reg_lambda=reg_lambda, num_layers=num_layers,
                                   thetas=thetas, trainings=train_set, input_label=input_labels,
                                   output_label=output_labels)
         # ----evaluate model------
-        predictions = test_set.apply(NN.forward_propagation, args=(structure, true_thetas, False,), axis=1)
+        predictions = test_set.apply(predict_with_NN, args=(input_labels, num_layers, true_thetas,), axis=1)
         actual = pd.Series((test_set[output_labels]).values.tolist())
         assert len(actual) != 0
         assert len(predictions) == len(actual)
-    return 0
+        correct_predicts = 0
+        for (a, p) in zip(actual, predictions):
+            predicted_class_index = np.argmax(p)
+            actual_class_index = np.argmax(a)
+            if predicted_class_index == actual_class_index:
+                correct_predicts += 1
+
+        print(f"Correct_predicts: {correct_predicts}, total: {len(actual)}, Accuracy: {correct_predicts / len(actual)}")
+        accuracies += correct_predicts / len(actual)
+    return accuracies / K
