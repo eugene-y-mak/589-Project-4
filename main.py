@@ -17,10 +17,10 @@ MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be
 MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
 CATEGORICALS = []
 K = 10
-HIDDEN_LAYER_STRUCTURE = [7, 7]
+HIDDEN_LAYER_STRUCTURE = [8]
 #ALPHA = 1 / (10 ** 2)
 ALPHA = 1
-EPSILON = 10e-100
+EPSILON = 10e-8
 REG_LAMBDA = 0
 
 
@@ -59,10 +59,14 @@ def main():
     actual = pd.Series((test_set[output_labels]).values.tolist())
     assert len(actual) != 0
     assert len(predictions) == len(actual)
+    accuracy = 0
+    for (a, p) in zip(actual, predictions):
+        predicted_class_index = np.argmax(p)
+        actual_class_index = np.argmax(a)
+        if predicted_class_index == actual_class_index:
+            accuracy += 1
+    print(accuracy/len(actual))
     # TODO:
-    #  1.) setup prediction function. Using best weights,
-    #  run forward prop for every training instance using those weights.
-    #  For each run, check prediction, apply argmax, check with label.
     #  2.) When checking with label, need to figure out how to check for TP vs FP
     return 0
 

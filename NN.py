@@ -24,7 +24,7 @@ def forward_propagation(training_inst, num_layers, thetas, do_print):
         a = sigmoid(z)
     # don't need bias for last one because not calculating gradient from last layer
     activations.append(np.array([a.copy()]))
-    print(a)
+    #print(a)
     return a, activations
 
 
@@ -140,6 +140,7 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_la
     return thetas
 
 
+# TODO: generate numbers between -1 to 1, not 0 to 1
 def make_random_weights(hidden_layer_structure, length_of_input, length_of_output):
     # For thetas:
     # num of rows = num of neurons in next layer
