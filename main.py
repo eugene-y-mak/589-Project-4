@@ -15,12 +15,12 @@ MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be
 # LABEL_HEADER = 'class'
 # MASTER_DATASET = pd.read_csv(CSV)
 MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
-POSSIBLE_CLASS_LABELS = helpers.get_attribute_values(MASTER_DATASET, LABEL_HEADER)
-STR_CATEGORICALS = []
+CATEGORICALS = []
 K = 10
 HIDDEN_LAYER_STRUCTURE = [7, 7]
-ALPHA = 1 / (10 ** 3)
-EPSILON = 10e-3
+#ALPHA = 1 / (10 ** 2)
+ALPHA = 1
+EPSILON = 10e-100
 REG_LAMBDA = 0
 
 
@@ -28,10 +28,12 @@ def main():
     column_names = MASTER_DATASET.columns.to_numpy().copy()
     all_attributes = np.delete(column_names, np.where(column_names == LABEL_HEADER))
     normalized_df = helpers.normalize_dataset(MASTER_DATASET)
+    possible_class_labels = helpers.get_attribute_values(MASTER_DATASET, LABEL_HEADER)
     # create folds
-    folds = sv.create_k_folds(K, normalized_df, POSSIBLE_CLASS_LABELS, LABEL_HEADER)
+    folds = sv.create_k_folds(K, normalized_df, LABEL_HEADER)
 
     # after making folds, process each one to have one hot encoding class labels for training
+    # also, normalize the data
     for i in range(len(folds)):
         folds[i] = helpers.encode_attribute(folds[i], LABEL_HEADER)
     assert K == len(folds)
@@ -39,7 +41,7 @@ def main():
     # input layer length must be equal to number of attributes
     # output layer length must be equal to number of classes
     num_layers = len(HIDDEN_LAYER_STRUCTURE) + 2  # add 2 more for input and output
-    thetas = NN.make_random_weights(HIDDEN_LAYER_STRUCTURE, len(all_attributes), len(POSSIBLE_CLASS_LABELS))
+    thetas = NN.make_random_weights(HIDDEN_LAYER_STRUCTURE, len(all_attributes), len(possible_class_labels))
 
     # TODO: fix this later obv, don't just use 1 fold iteration
     test_set = folds[0]
@@ -50,10 +52,10 @@ def main():
     input_labels = [col for col in train_set.columns if LABEL_HEADER not in col]
     output_labels = [col for col in train_set.columns if LABEL_HEADER in col]
     true_thetas = NN.train_NN(alpha=ALPHA, epsilon=EPSILON, reg_lambda=REG_LAMBDA,
-                              num_layers=len(HIDDEN_LAYER_STRUCTURE) + 2, thetas=thetas, trainings=train_set,
+                              num_layers=num_layers, thetas=thetas, trainings=train_set,
                               input_label=input_labels, output_label=output_labels)
 
-    predictions = test_set.apply(sv.predict_with_NN, args=(input_labels, HIDDEN_LAYER_STRUCTURE, true_thetas,), axis=1)
+    predictions = test_set.apply(sv.predict_with_NN, args=(input_labels, num_layers, true_thetas,), axis=1)
     actual = pd.Series((test_set[output_labels]).values.tolist())
     assert len(actual) != 0
     assert len(predictions) == len(actual)

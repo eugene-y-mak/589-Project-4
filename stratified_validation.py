@@ -1,6 +1,7 @@
 import sklearn
 import pandas as pd
 import NN
+import helpers
 
 
 def separate_dataset_by_class(dataset, total_count, possible_class_labels, label_header):
@@ -15,9 +16,10 @@ def separate_dataset_by_class(dataset, total_count, possible_class_labels, label
     return datasets, ratios
 
 
-def create_k_folds(k, dataset, possible_class_labels, label_header):
+def create_k_folds(k, dataset, label_header):
     # 1.) divide dataset into several separated by class
     total_count = len(dataset)
+    possible_class_labels = helpers.get_attribute_values(dataset, label_header)
     datasets, ratios = separate_dataset_by_class(dataset, total_count, possible_class_labels, label_header)
 
     # 2.) For each class dataset, evenly distribute to k folds. Combine folds at the end
@@ -47,9 +49,9 @@ def create_k_folds(k, dataset, possible_class_labels, label_header):
 
 
 # uses forward prop to make a prediction
-def predict_with_NN(row, input_labels, structure, true_thetas):
+def predict_with_NN(row, input_labels, num_layers, true_thetas):
     training_inst = row[input_labels].to_numpy()
-    output, _ = NN.forward_propagation(training_inst, len(structure)+2, true_thetas, False)
+    output, _ = NN.forward_propagation(training_inst, num_layers, true_thetas, False)
     return output
 
 

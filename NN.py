@@ -24,6 +24,7 @@ def forward_propagation(training_inst, num_layers, thetas, do_print):
         a = sigmoid(z)
     # don't need bias for last one because not calculating gradient from last layer
     activations.append(np.array([a.copy()]))
+    print(a)
     return a, activations
 
 
