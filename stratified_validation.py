@@ -2,15 +2,13 @@ import sklearn
 import pandas as pd
 import NN
 import helpers
-import numpy as np
 
 
 def separate_dataset_by_class(dataset, total_count, possible_class_labels, label_header):
     datasets = []
     ratios = {}
     for label in possible_class_labels:
-        # new_dataset = sklearn.utils.shuffle(dataset[dataset[label_header] == label].copy(),random_state=7)
-        # get copy of slice
+
         new_dataset = sklearn.utils.shuffle(dataset[dataset[label_header] == label].copy())  # get copy of slice
         datasets.append(new_dataset)
         ratios[label] = len(new_dataset) / total_count
@@ -60,6 +58,7 @@ def evaluate_NN(label_header, K, folds, hidden_layer_structure, alpha, epsilon, 
     accuracies = 0
     F1s = 0
     for i in range(K):
+        print(f"----------------------------Fold {i+1}-----------------------------")
         test_set = folds[i]
         train_set = []
         for j in range(K):
@@ -88,7 +87,6 @@ def evaluate_NN(label_header, K, folds, hidden_layer_structure, alpha, epsilon, 
         if num_classes > 2:  # if multiclass
             accuracy = 0
             F1 = 0
-            # NOTE: np.unique(actual) should HOPEFULLY always return all classes
             for argmax_index in range(3):
                 acc, f1 = helpers.calculate_metrics(actual, predictions, argmax_index)
                 accuracy += acc
@@ -98,14 +96,8 @@ def evaluate_NN(label_header, K, folds, hidden_layer_structure, alpha, epsilon, 
             F1 /= num_classes
         else:
             accuracy, F1 = helpers.calculate_metrics(actual, predictions, 0)
-        # print(accuracy)
         accuracies += accuracy
         F1s += F1
-        # correct_predicts = 0
-        # for (a, p) in zip(actual, predictions):
-        #     predicted_class_index = np.argmax(p)
-        #     actual_class_index = np.argmax(a)
-        #     if predicted_class_index == actual_class_index:
-        #         correct_predicts += 1
-        # print(f"Correct_predicts: {correct_predicts}, total: {len(actual)}, Accuracy: {correct_predicts / len(actual)}")
+        print(f"Accuracy: {accuracy}")
+        print(f"F1: {F1}")
     return (accuracies / K), (F1s / K)

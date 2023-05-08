@@ -33,7 +33,7 @@ elif DATA == 1:
     HIDDEN_LAYER_STRUCTURE = [16]
     ALPHA = 2
     EPSILON = -float('inf')  # 10e-8 -float('inf')
-    EPOCHS = 500
+    EPOCHS = 500 # unused, for now
     REG_LAMBDA = 0
 
 

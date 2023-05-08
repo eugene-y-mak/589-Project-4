@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 
 
@@ -18,7 +17,7 @@ def get_attribute_values(master_dataset, label_header):
 
 
 # actuals and predictions are series
-# returns accuracy, precision, recall, F1 for predictions with specified positive class
+# returns accuracy, F1 for predictions with specified positive class
 def calculate_metrics(actual, predictions, positive_class_label):
     TP = 0
     FP = 0
