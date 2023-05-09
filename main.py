@@ -10,7 +10,7 @@ import stratified_validation as sv
 # house -- 1
 # cancer -- 2
 # CMC -- 3
-DATA = 1
+DATA = 3
 
 # structures to test:
 # [4] lambda=0
@@ -33,7 +33,7 @@ DATA = 1
 if DATA == 0:
     # ------------- For Wine Dataset --------------------- (for later, make these arguments)
     CSV = 'datasets/hw3_wine.csv'
-    #CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_wine.csv"
+    # CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_wine.csv"
     NAME = "Wine"
     LABEL_HEADER = '# class'
     MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
@@ -47,7 +47,7 @@ if DATA == 0:
 
 elif DATA == 1:
     CSV = 'datasets/hw3_house_votes_84.csv'
-    #CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_house_votes_84.csv"
+    # CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_house_votes_84.csv"
     NAME = "House Votes"
     LABEL_HEADER = 'class'
     MASTER_DATASET = pd.read_csv(CSV)
@@ -87,6 +87,11 @@ elif DATA == 3:
 
     MASTER_DATASET = pd.read_csv(CSV, names=COLUMN_NAMES)
     MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
+    K = 10
+    HIDDEN_LAYER_STRUCTURE = [8]
+    ALPHA = 1
+    EPSILON = 10e-7
+    REG_LAMBDA = 0
 
 
 def main():
@@ -97,16 +102,13 @@ def main():
     # one hot encode entire dataset
     normalized_OHE_df = helpers.encode_attribute(normalized_df, LABEL_HEADER)
 
+    # OHE categoricals
+    for category in CATEGORICALS:
+        normalized_OHE_df = helpers.encode_attribute(normalized_OHE_df, category)
+
     # create folds from one hot version
     folds = sv.create_k_folds(K, normalized_OHE_df, LABEL_HEADER, possible_class_labels)
 
-    # TODO: for CMC EC, one hot encode for categoricals with string elements
-    # after making folds, process each one to have one hot encoding class labels for training
-    # for i in range(len(folds)):
-    #     folds[i] = helpers.encode_attribute(folds[i], LABEL_HEADER)
-    #     for category in CATEGORICALS:
-    #         print("encoding categories")
-    #         folds[i] = helpers.encode_attribute(folds[i], category)
     assert K == len(folds)
     accuracy, F1 = sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)
     print(f"Final accuracy: {accuracy}, F1: {F1}")
