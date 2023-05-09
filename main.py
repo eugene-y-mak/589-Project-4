@@ -5,12 +5,13 @@ import NN
 import helpers
 import numpy as np
 import stratified_validation as sv
+from sklearn.model_selection import train_test_split
 
 # wine -- 0
 # house -- 1
 # cancer -- 2
 # CMC -- 3
-DATA = 3
+DATA = 1
 
 # structures to test:
 # [4] lambda=0
@@ -40,9 +41,9 @@ if DATA == 0:
     MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
     CATEGORICALS = []
     K = 10
-    HIDDEN_LAYER_STRUCTURE = [9]
-    ALPHA = 1
-    EPSILON = 10e-7
+    HIDDEN_LAYER_STRUCTURE = [16, 8, 4, 2]
+    ALPHA = 1e-1
+    EPSILON = 10e-8
     REG_LAMBDA = 0
 
 elif DATA == 1:
@@ -112,6 +113,9 @@ def main():
     assert K == len(folds)
     accuracy, F1 = sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)
     print(f"Final accuracy: {accuracy}, F1: {F1}")
+
+    # creating learning curve graph
+    train_set, test_set = train_test_split(normalized_OHE_df, test_size=0.2)
     return 0
 
 

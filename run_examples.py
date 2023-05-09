@@ -19,7 +19,7 @@ def run_example(reg_lambda, structure, thetas, trainings):
 
 def main(example):
     if example == 1:
-        print("--------------------------------TESTING EXAMPLE 1--------------------------------")
+        print("TESTING EXAMPLE 1")
         # -----------------Q1-------------------------
         # For thetas:
         # num of rows = num of neurons in next layer
@@ -33,7 +33,7 @@ def main(example):
                     df)
 
     elif example == 2:
-        print("--------------------------------TESTING EXAMPLE 1--------------------------------")
+        print("TESTING EXAMPLE 2")
         # -----------------Q2------------------------
         run_example(0.250, len([2, 4, 3, 2]),
                     [np.array([[0.42000, 0.15000, 0.40000],  # theta 1

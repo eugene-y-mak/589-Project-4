@@ -142,6 +142,28 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_la
     return thetas
 
 
+def train_NN_plot(alpha, epsilon, reg_lambda, num_layers, thetas,
+                  trainings, input_label, output_label, max_iterations=500):
+    performance = []
+    num_trainings = []
+    assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
+    # stopping criteria:
+    # cost function improves by less than epsilon e
+    J = cost(reg_lambda, num_layers, thetas, trainings, input_label, output_label, False)
+    print(f"Initial cost: {J}")
+    diff = float('inf')
+    iterations = 0
+    while diff > epsilon and iterations < max_iterations:
+        # print(f"Cost: {J}")
+        new_cost, new_thetas = back_propagation(alpha, reg_lambda, num_layers, thetas,
+                                                trainings, input_label, output_label, False)
+        diff = abs(J - new_cost)
+        J = new_cost
+        thetas = new_thetas
+        iterations += 1
+    print(f"Final cost: {J}")
+
+
 def make_random_weights(hidden_layer_structure, length_of_input, length_of_output):
     # For thetas:
     # num of rows = num of neurons in next layer
