@@ -8,17 +8,15 @@ def separate_dataset_by_class(dataset, total_count, possible_class_labels, label
     datasets = []
     ratios = {}
     for label in possible_class_labels:
-
-        new_dataset = sklearn.utils.shuffle(dataset[dataset[label_header] == label].copy())  # get copy of slice
+        new_dataset = sklearn.utils.shuffle(dataset[dataset[f"{label_header}_{label}"] == 1].copy())  # get copy of slice
         datasets.append(new_dataset)
         ratios[label] = len(new_dataset) / total_count
     return datasets, ratios
 
 
-def create_k_folds(k, dataset, label_header):
+def create_k_folds(k, dataset, label_header, possible_class_labels):
     # 1.) divide dataset into several separated by class
     total_count = len(dataset)
-    possible_class_labels = helpers.get_attribute_values(dataset, label_header)
     datasets, ratios = separate_dataset_by_class(dataset, total_count, possible_class_labels, label_header)
 
     # 2.) For each class dataset, evenly distribute to k folds. Combine folds at the end
