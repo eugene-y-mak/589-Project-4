@@ -6,30 +6,13 @@ import helpers
 import numpy as np
 import stratified_validation as sv
 from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 # wine -- 0
 # house -- 1
 # cancer -- 2
 # CMC -- 3
-DATA = 1
-
-# structures to test:
-# [4] lambda=0
-# [8] lambda=0
-# [16] lambda=0
-# [32] lambda=0
-# [8, 4] lambda=0
-# [4, 8] lambda=0
-# [32, 16] lambda=0
-# [16, 32] lambda=0
-# [8, 4, 2] lambda=0
-# [2, 4, 8] lambda=0
-# [16, 8, 4, 2] lambda=0
-
-# [8] lambda = 0.25
-# [8, 4] lambda = 0.25
-# [8] lambda = 0.5? or 1
-# [8, 4] lambda = 0.5 or 1
+DATA = 3
 
 if DATA == 0:
     # ------------- For Wine Dataset --------------------- (for later, make these arguments)
@@ -41,9 +24,10 @@ if DATA == 0:
     MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
     CATEGORICALS = []
     K = 10
-    HIDDEN_LAYER_STRUCTURE = [16, 8, 4, 2]
+    HIDDEN_LAYER_STRUCTURE = [32]
+    EPOCHS = 500
     ALPHA = 1e-1
-    EPSILON = 10e-8
+    EPSILON = 10e-4
     REG_LAMBDA = 0
 
 elif DATA == 1:
@@ -58,21 +42,23 @@ elif DATA == 1:
     K = 10
     HIDDEN_LAYER_STRUCTURE = [16]
     ALPHA = 10e-1
-    EPSILON = 10e-8  # 10e-8 -float('inf')
-    EPOCHS = 500  # unused, for now
+    EPSILON = 10e-4  # 10e-8 -float('inf')
+    EPOCHS = 500
     REG_LAMBDA = 0
 
 elif DATA == 2:
-    CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_cancer.csv"
+    CSV = 'datasets/hw3_cancer.csv'
+    #CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_cancer.csv"
     NAME = "Cancer"
     LABEL_HEADER = 'Class'
     MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
     MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
     CATEGORICALS = []
     K = 10
-    HIDDEN_LAYER_STRUCTURE = [8]
-    ALPHA = 1
-    EPSILON = 10e-7
+    HIDDEN_LAYER_STRUCTURE = [32, 16]
+    ALPHA = 0.1
+    EPSILON = 10e-5
+    EPOCHS = 500
     REG_LAMBDA = 0
 
 elif DATA == 3:
@@ -89,13 +75,14 @@ elif DATA == 3:
     MASTER_DATASET = pd.read_csv(CSV, names=COLUMN_NAMES)
     MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
     K = 10
-    HIDDEN_LAYER_STRUCTURE = [8]
+    HIDDEN_LAYER_STRUCTURE = [16]
     ALPHA = 1
-    EPSILON = 10e-7
+    EPSILON = 10e-5
     REG_LAMBDA = 0
-
+    EPOCHS = 500
 
 def main():
+    print(NAME)
     # normalize data
     normalized_df = helpers.normalize_dataset(MASTER_DATASET)
     possible_class_labels = helpers.get_attribute_values(normalized_df, LABEL_HEADER)
@@ -110,12 +97,27 @@ def main():
     # create folds from one hot version
     folds = sv.create_k_folds(K, normalized_OHE_df, LABEL_HEADER, possible_class_labels)
 
+    # ----------------- EVALUATION --------------------
     assert K == len(folds)
     accuracy, F1 = sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)
     print(f"Final accuracy: {accuracy}, F1: {F1}")
 
-    # creating learning curve graph
-    train_set, test_set = train_test_split(normalized_OHE_df, test_size=0.2)
+    # --------------- Learning Curve ------------------
+    test_set = folds[0]
+    train_set = []
+    for j in range(1, K):
+        train_set.append(folds[j])
+    train_set = pd.concat(train_set)
+    input_labels = [col for col in train_set.columns if LABEL_HEADER not in col]
+    output_labels = [col for col in train_set.columns if LABEL_HEADER in col]
+    thetas = NN.make_random_weights(HIDDEN_LAYER_STRUCTURE, len(input_labels), len(output_labels))
+    y_axis_perf, x_axis_trains = NN.train_NN_plot(ALPHA, EPSILON, REG_LAMBDA, len(HIDDEN_LAYER_STRUCTURE) + 2, thetas,
+                                                  train_set, input_labels, output_labels, test_set, EPOCHS)
+    plt.plot(x_axis_trains, y_axis_perf)
+    plt.title(f"{NAME} Dataset Learning Curve")
+    plt.ylabel("Performance (J)")
+    plt.xlabel("Number of Training Samples")
+    plt.show()
     return 0
 
 

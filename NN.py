@@ -122,6 +122,52 @@ def back_propagation(alpha, reg_lambda, num_layers, thetas, trainings, input_lab
     return new_cost, thetas
 
 
+def numerical_gradients_check(Thetas, eps, Num_layers, Trainings, Input_label, Output_label, Do_print):
+    def J(num_layers, thetas, trainings, input_label, output_label, do_print):
+        j_sum = 0
+        i = 0
+        # Convert dataframe columns of input or output label(s) to a series of df rows in form of lists
+        attribute_data = pd.Series((trainings[input_label]).values.tolist())
+        label_data = pd.Series((trainings[output_label]).values.tolist())
+        for training_inst in zip(attribute_data, label_data):
+            if do_print: print(f"-----------------------------Training Instance {i + 1}-----------------------------")
+            output, _ = forward_propagation(np.array(training_inst[0]), num_layers, thetas, do_print)
+            y = np.array(training_inst[1])
+            if do_print:
+                print(f"Predicted output: {output}")
+                print(f"Expected output: {y}")
+            assert (y.ndim == 1)  # ensure training instance is just vector, since it's the last layer
+            j = (-1 * y) * np.log(output) - ((np.ones(y.size) - y) * np.log(np.ones(y.size) - output))
+            assert (j.ndim == 1)  # j should also be just a vector since y and output are vecs
+            j = np.sum(j)
+            if do_print: print(f"Cost J: {j}")
+            j_sum += j
+            i += 1
+        n = len(trainings)
+        j_sum /= n
+        return j_sum
+
+    theta_num = 1
+    for k in range(len(Thetas)):
+        # theta is all weights for layer
+        theta = Thetas[k]
+        verifier_theta = np.zeros(theta.shape)
+        print(f"theta {theta_num}")
+        for weight in theta.flat:
+            new_thetas = Thetas.copy()
+            new_theta = theta.copy()
+            i, j = np.where(theta == weight)
+            new_theta[i, j] = weight + eps
+            new_thetas[k] = new_theta
+            first_val = J(Num_layers, new_thetas, Trainings, Input_label, Output_label, Do_print)
+            new_theta[i, j] = weight - eps
+            new_thetas[k] = new_theta
+            second_val = J(Num_layers, new_thetas, Trainings, Input_label, Output_label, Do_print)
+            verifier_theta[i, j] = (first_val - second_val) / eps
+        theta_num += 1
+        print(verifier_theta)
+
+
 def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_label, output_label, max_iterations=500):
     assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     # stopping criteria:
@@ -143,9 +189,7 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_la
 
 
 def train_NN_plot(alpha, epsilon, reg_lambda, num_layers, thetas,
-                  trainings, input_label, output_label, max_iterations=500):
-    performance = []
-    num_trainings = []
+                  trainings, input_label, output_label, test_set, max_iterations=500):
     assert (num_layers == len(thetas) + 1)  # make sure num_layers is correct
     # stopping criteria:
     # cost function improves by less than epsilon e
@@ -153,6 +197,8 @@ def train_NN_plot(alpha, epsilon, reg_lambda, num_layers, thetas,
     print(f"Initial cost: {J}")
     diff = float('inf')
     iterations = 0
+    performance = [J]
+    num_trainings = [iterations]
     while diff > epsilon and iterations < max_iterations:
         # print(f"Cost: {J}")
         new_cost, new_thetas = back_propagation(alpha, reg_lambda, num_layers, thetas,
@@ -161,7 +207,12 @@ def train_NN_plot(alpha, epsilon, reg_lambda, num_layers, thetas,
         J = new_cost
         thetas = new_thetas
         iterations += 1
+        num_trainings.append(iterations)
+        # get performance from test_set
+        performance.append(cost(reg_lambda, num_layers, thetas, test_set, input_label, output_label, False)
+                           )
     print(f"Final cost: {J}")
+    return performance, num_trainings
 
 
 def make_random_weights(hidden_layer_structure, length_of_input, length_of_output):
