@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 # house -- 1
 # cancer -- 2
 # CMC -- 3
-DATA = 3
+DATA = 0
 
 if DATA == 0:
     # ------------- For Wine Dataset --------------------- (for later, make these arguments)
@@ -57,7 +57,7 @@ elif DATA == 2:
     K = 10
     HIDDEN_LAYER_STRUCTURE = [32, 16]
     ALPHA = 0.1
-    EPSILON = 10e-5
+    EPSILON = 10e-4
     EPOCHS = 500
     REG_LAMBDA = 0
 
@@ -77,7 +77,7 @@ elif DATA == 3:
     K = 10
     HIDDEN_LAYER_STRUCTURE = [16]
     ALPHA = 1
-    EPSILON = 10e-5
+    EPSILON = 10e-4
     REG_LAMBDA = 0
     EPOCHS = 500
 
@@ -98,9 +98,9 @@ def main():
     folds = sv.create_k_folds(K, normalized_OHE_df, LABEL_HEADER, possible_class_labels)
 
     # ----------------- EVALUATION --------------------
-    assert K == len(folds)
-    accuracy, F1 = sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)
-    print(f"Final accuracy: {accuracy}, F1: {F1}")
+    # assert K == len(folds)
+    # accuracy, F1 = sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)
+    # print(f"Final accuracy: {accuracy}, F1: {F1}")
 
     # --------------- Learning Curve ------------------
     test_set = folds[0]

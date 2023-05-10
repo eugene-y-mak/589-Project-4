@@ -207,7 +207,9 @@ def train_NN_plot(alpha, epsilon, reg_lambda, num_layers, thetas,
         J = new_cost
         thetas = new_thetas
         iterations += 1
-        num_trainings.append(iterations)
+        print(iterations)
+        num_trainings.append(iterations * len(trainings.index))
+        print(iterations * len(trainings.index))
         # get performance from test_set
         performance.append(cost(reg_lambda, num_layers, thetas, test_set, input_label, output_label, False)
                            )
