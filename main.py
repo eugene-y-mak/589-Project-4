@@ -7,12 +7,12 @@ import numpy as np
 import stratified_validation as sv
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
-
+from sklearn import datasets, svm, metrics
 # wine -- 0
 # house -- 1
 # cancer -- 2
 # CMC -- 3
-DATA = 0
+DATA = 4
 
 if DATA == 0:
     # ------------- For Wine Dataset --------------------- (for later, make these arguments)
@@ -48,7 +48,7 @@ elif DATA == 1:
 
 elif DATA == 2:
     CSV = 'datasets/hw3_cancer.csv'
-    #CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_cancer.csv"
+    # CSV = "/Users/eugenemak/PycharmProjects/589-Project-4/datasets/hw3_cancer.csv"
     NAME = "Cancer"
     LABEL_HEADER = 'Class'
     MASTER_DATASET = pd.read_csv(CSV, sep='\t')  # Note: separating character can be different!
@@ -74,6 +74,7 @@ elif DATA == 3:
 
     MASTER_DATASET = pd.read_csv(CSV, names=COLUMN_NAMES)
     MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
+
     K = 10
     HIDDEN_LAYER_STRUCTURE = [16]
     ALPHA = 1
@@ -81,10 +82,28 @@ elif DATA == 3:
     REG_LAMBDA = 0
     EPOCHS = 500
 
+elif DATA == 4:
+    digits = datasets.load_digits()
+    MASTER_DATASET = pd.DataFrame(digits.images.reshape((len(digits.images), -1)))
+    labels = digits.target
+    NAME = "Digits"
+    LABEL_HEADER = '64'
+    CATEGORICALS = []
+    MASTER_DATASET[LABEL_HEADER] = labels
+    MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
+    K = 10
+    HIDDEN_LAYER_STRUCTURE = [4, 4, 4, 4, 4]
+    ALPHA = 2
+    EPSILON = 10e-4
+    REG_LAMBDA = 0
+    EPOCHS = 500
+
+
 def main():
     print(NAME)
     # normalize data
     normalized_df = helpers.normalize_dataset(MASTER_DATASET)
+    normalized_df.columns = normalized_df.columns.map(str)
     possible_class_labels = helpers.get_attribute_values(normalized_df, LABEL_HEADER)
 
     # one hot encode entire dataset
@@ -98,9 +117,9 @@ def main():
     folds = sv.create_k_folds(K, normalized_OHE_df, LABEL_HEADER, possible_class_labels)
 
     # ----------------- EVALUATION --------------------
-    # assert K == len(folds)
-    # accuracy, F1 = sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)
-    # print(f"Final accuracy: {accuracy}, F1: {F1}")
+    assert K == len(folds)
+    accuracy, F1 = sv.evaluate_NN(LABEL_HEADER, K, folds, HIDDEN_LAYER_STRUCTURE, ALPHA, EPSILON, REG_LAMBDA)
+    print(f"Final accuracy: {accuracy}, F1: {F1}")
 
     # --------------- Learning Curve ------------------
     test_set = folds[0]

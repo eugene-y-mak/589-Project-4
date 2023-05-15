@@ -1,14 +1,20 @@
 import numpy as np
 import pandas as pd
-
+from sklearn import preprocessing
 
 def encode_attribute(dataset, header_name):
     return pd.get_dummies(dataset, columns=[header_name], dtype=int)
 
 
-def normalize_dataset(df):  # normalizes and does one hot encoding
-    normalized_df = (df - df.min()) / (df.max() - df.min())
-    return normalized_df
+def normalize_dataset(df):  # normalizes
+    # print(df.min())
+    # print(df.max())
+    # normalized_df = 0 if (df.max() - df.min()) == 0 else (df - df.min()) / (df.max() - df.min())
+    x = df.values
+    min_max_scaler = preprocessing.MinMaxScaler()
+    x_scaled = min_max_scaler.fit_transform(x)
+    df = pd.DataFrame(x_scaled)
+    return df
 
 
 # gets all possible unique values from given attribute header/name in full dataset.
@@ -28,7 +34,8 @@ def calculate_metrics(actual, predictions, positive_class_label):
     F1 = 0
     for (a, p) in zip(actual, predictions):
         predicted_class_index = np.argmax(p)
-        prediction_array = np.zeros(3)
+        print(predicted_class_index)
+        prediction_array = np.zeros(len(p))
         prediction_array[predicted_class_index] = 1
         actual_class_index = np.argmax(a)
         if actual_class_index == positive_class_label:

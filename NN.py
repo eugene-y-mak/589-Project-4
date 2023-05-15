@@ -182,6 +182,7 @@ def train_NN(alpha, epsilon, reg_lambda, num_layers, thetas, trainings, input_la
                                                 trainings, input_label, output_label, False)
         diff = abs(J - new_cost)
         J = new_cost
+        print(J)
         thetas = new_thetas
         iterations += 1
     print(f"Final cost: {J}")
