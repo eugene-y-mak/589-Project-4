@@ -92,12 +92,31 @@ elif DATA == 4:
     MASTER_DATASET[LABEL_HEADER] = labels
     MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
     K = 10
-    HIDDEN_LAYER_STRUCTURE = [4, 4, 4, 4, 4]
+    HIDDEN_LAYER_STRUCTURE = [100, 100]
     ALPHA = 2
     EPSILON = 10e-4
     REG_LAMBDA = 0
     EPOCHS = 500
 
+elif DATA == 5:
+    CSV = 'finaldatasets/titanic.csv'
+    NAME = "Titanic"
+    COLUMN_NAMES = ["Wife's age", "Wife's education", "Husband's education", "Number of children ever born",
+                    "Wife's religion", "Wife's now working?", "Husband's occupation", "Standard-of-living index",
+                    "Media exposure", "Contraceptive method used"]
+    LABEL_HEADER = "Contraceptive method used"
+    CATEGORICALS = ["Wife's education", "Husband's education", "Wife's religion", "Wife's now working?",
+                    "Husband's occupation", "Standard-of-living index", "Media exposure"]
+
+    MASTER_DATASET = pd.read_csv(CSV, names=COLUMN_NAMES)
+    MASTER_DATASET.columns = MASTER_DATASET.columns.map(str)
+
+    K = 10
+    HIDDEN_LAYER_STRUCTURE = [16]
+    ALPHA = 1
+    EPSILON = 10e-4
+    REG_LAMBDA = 0
+    EPOCHS = 500
 
 def main():
     print(NAME)

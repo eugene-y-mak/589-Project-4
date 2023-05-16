@@ -82,10 +82,11 @@ def evaluate_NN(label_header, K, folds, hidden_layer_structure, alpha, epsilon, 
         assert len(predictions) == len(actual)
         # ---------------------------METRICS--------------------------
         num_classes = len(output_labels)
+
         if num_classes > 2:  # if multiclass
             accuracy = 0
             F1 = 0
-            for argmax_index in range(3):
+            for argmax_index in range(num_classes):
                 acc, f1 = helpers.calculate_metrics(actual, predictions, argmax_index)
                 accuracy += acc
                 F1 += f1
